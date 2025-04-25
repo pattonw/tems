@@ -69,7 +69,7 @@ unet = build_unet(downsample_factors[0])
 try:
     torch.jit.script(unet)
     print("Successfully scripted tems.UNet")
-except torch.jit.Error as e:
+except RuntimeError as e:
     print("Failed to script tems.UNet:", e)
 
 # %%

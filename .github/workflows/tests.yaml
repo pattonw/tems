@@ -21,8 +21,9 @@ jobs:
 
     - name: Test with pytest
       run: |
+        uv sync --resolution ${{ matrix.resolution }} --python ${{ matrix.python-version }} --extra dev
         uv pip install -e .
-        uv run --extra dev --resolution ${{ matrix.resolution }} --python ${{ matrix.python-version}} pytest --cov tests
+        uv run pytest --cov tests
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v2

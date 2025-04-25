@@ -62,7 +62,7 @@ def build_funlib_unet(downsample_factors):
 
 
 # %% [markdown]
-# ## Jit script
+# ## Jit scripting
 
 # %%
 unet = build_unet(downsample_factors[0])
@@ -82,7 +82,9 @@ except RuntimeError as e:
 
 
 # %% [markdown]
-# ### Comparison function
+# ## Cropping
+
+# %%
 def test_unet_comparison(tems_unet: UNet, funlib_unet: FunlibUNet, input_shape):
     in_data = torch.rand(1, 1, *(input_shape))
     print("Input shape:", list(in_data.shape[2:]))

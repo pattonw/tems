@@ -28,9 +28,9 @@ jobs:
 
       - name: Turn script into notebook
         run: |
-          uv run --extra docs python -m ipykernel install --name tems --user
+          uv run --extra docs python -m ipykernel install --name tems_env --user
           uv run --extra docs jupytext --to notebook ./tutorials/funlib_comparison.py
-          cp -r examples docs/source
+          cp -r tutorials docs/source
 
       - name: Build documentation
         run: uv run --extra docs sphinx-build docs/source docs/build/html -b html

@@ -1,0 +1,15 @@
+*.sw[pmno]
+*.hdf
+*.h5
+*.ipynb
+*.pyc
+*.egg-info
+*.dat
+*.lock
+*.cpp
+*.so
+*.coverage
+build
+.pytest_cache
+.vscode
+.coverage.Williams-MacBook-Pro-2.local.50187.XkuuXdcx

@@ -16,7 +16,7 @@ def identity(module: torch.nn.Module, tmp_path) -> torch.nn.Module:
 
 def save_load(module: torch.nn.Module, tmp_path) -> torch.nn.Module:
     torch.save(module, tmp_path / "module.pt")
-    return torch.load(tmp_path / "module.pt")
+    return torch.load(tmp_path / "module.pt", weights_only=False)
 
 
 def jit_script(module: torch.nn.Module, tmp_path) -> torch.nn.Module:

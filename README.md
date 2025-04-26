@@ -5,7 +5,7 @@
 
 [![pypi](https://img.shields.io/pypi/v/tems.svg)](https://pypi.python.org/pypi/tems)
 
-# Translation Equivariant ModelS (tems)
+# Translation Equivariant ModelS (TEMS)
 
 See the docs [here](https://pattonw.github.io/tems)
 

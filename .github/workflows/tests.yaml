@@ -23,10 +23,9 @@ jobs:
       run: |
         uv sync --resolution ${{ matrix.resolution }} --python ${{ matrix.python-version }} --extra dev
         uv pip install -e .
-        uv run pytest --cov tests
+        uv run pytest --cov --cov-branch --cov-report=xml
 
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v2
+      uses: codecov/codecov-action@v5
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
-        fail_ci_if_error: false

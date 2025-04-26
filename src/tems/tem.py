@@ -10,7 +10,7 @@ class ContextAwareModule(ABC, torch.nn.Module):
 
     @property
     @abstractmethod
-    def invariant_step(self) -> torch.Tensor: ...
+    def equivariant_step(self) -> torch.Tensor: ...
 
     @property
     @abstractmethod

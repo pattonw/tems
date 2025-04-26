@@ -21,7 +21,7 @@ class ConvPass(ContextAwareModule):
     """
 
     _context: torch.Tensor
-    _invariant_step: torch.Tensor
+    _equivariant_step: torch.Tensor
     _dims: int
 
     def __init__(
@@ -37,7 +37,7 @@ class ConvPass(ContextAwareModule):
 
         self._dims = dims
         self._context = torch.tensor((0,) * dims)
-        self._invariant_step = torch.tensor((1,) * dims)
+        self._equivariant_step = torch.tensor((1,) * dims)
 
         layers: list[torch.nn.Module] = []
 
@@ -93,11 +93,11 @@ class ConvPass(ContextAwareModule):
         return self._context
 
     @property
-    def invariant_step(self) -> torch.Tensor:
+    def equivariant_step(self) -> torch.Tensor:
         """
         Always 1 for ConvPass since we don't yet support strided convolutions.
         """
-        return self._invariant_step
+        return self._equivariant_step
 
     @property
     def min_input_shape(self) -> torch.Tensor:

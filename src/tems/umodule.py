@@ -22,7 +22,7 @@ class UModule(ContextAwareModule):
 
     equivariance_context: torch.Tensor
     _dims: int
-    _invariant_step: torch.Tensor
+    _equivariant_step: torch.Tensor
 
     def __init__(
         self,
@@ -35,9 +35,9 @@ class UModule(ContextAwareModule):
     ):
         super().__init__()
         self._dims = in_conv_pass.dims
-        self._invariant_step = downsample.invariant_step * lower_block.invariant_step
+        self._equivariant_step = downsample.equivariant_step * lower_block.equivariant_step
         assert torch.equal(
-            downsample.invariant_step * upsample.invariant_step,
+            downsample.equivariant_step * upsample.equivariant_step,
             torch.tensor((1,) * self.dims),
         ), "Down and Up sampling must have the same scale factor"
 
@@ -70,7 +70,7 @@ class UModule(ContextAwareModule):
     @property
     def context(self) -> torch.Tensor:
         """
-        `in_conv_pass.context` + `downsample.invariant_step * lower_block.context`
+        `in_conv_pass.context` + `downsample.equivariant_step * lower_block.context`
         + `out_conv_pass.context` + (Optional `equivariance_context`)
 
         The equivariance context is only added during evaluation and is used to make
@@ -79,7 +79,7 @@ class UModule(ContextAwareModule):
         """
         base_context = (
             self.in_conv_pass.context
-            + self.downsample.invariant_step * self.lower_block.context
+            + self.downsample.equivariant_step * self.lower_block.context
             + self.out_conv_pass.context
         )
 
@@ -89,11 +89,11 @@ class UModule(ContextAwareModule):
             return base_context + self.equivariance_context
 
     @property
-    def invariant_step(self) -> torch.Tensor:
+    def equivariant_step(self) -> torch.Tensor:
         """
         The invariant step is the product of the downsample factors.
         """
-        return self._invariant_step
+        return self._equivariant_step
 
     @property
     def min_input_shape(self) -> torch.Tensor:
@@ -107,7 +107,7 @@ class UModule(ContextAwareModule):
 
         # Upsample the lower block output shape and subtract our out conv context
         min_lower_output = (
-            lower_block_output_shape / self.upsample.invariant_step
+            lower_block_output_shape / self.upsample.equivariant_step
         ).long()
         min_out = min_lower_output - self.out_conv_pass.context
 
@@ -117,11 +117,11 @@ class UModule(ContextAwareModule):
 
         # we must round this value up to the next multiple of the invariant step
         min_expansion = (
-            torch.ceil(min_expansion / self.invariant_step) * self.invariant_step
+            torch.ceil(min_expansion / self.equivariant_step) * self.equivariant_step
         ).long()
 
         # whats the minimum input shape of the lower block scaled by the downsample step
-        min_lower_input = lower_block_input_shape * self.downsample.invariant_step
+        min_lower_input = lower_block_input_shape * self.downsample.equivariant_step
 
         # now we just add the min_expansion term, and the context from the input conv pass
         min_input_shape = min_lower_input + min_expansion + self.in_conv_pass.context

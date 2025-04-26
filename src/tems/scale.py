@@ -16,7 +16,7 @@ class Downsample(ContextAwareModule):
     """
 
     _context: torch.Tensor
-    _invariant_step: torch.Tensor
+    _equivariant_step: torch.Tensor
     _dims: int
 
     def __init__(self, dims: int, downsample_factor: Sequence[int] | int):
@@ -42,7 +42,7 @@ class Downsample(ContextAwareModule):
             padding=(0,) * dims,
         )
 
-        self._invariant_step = self._context + torch.tensor(_downsample_factor)
+        self._equivariant_step = self._context + torch.tensor(_downsample_factor)
 
     @property
     def context(self) -> torch.Tensor:
@@ -52,18 +52,18 @@ class Downsample(ContextAwareModule):
         return self._context
 
     @property
-    def invariant_step(self) -> torch.Tensor:
+    def equivariant_step(self) -> torch.Tensor:
         """
         The invariant step is the downsample factor for each dimension.
         """
-        return self._invariant_step
+        return self._equivariant_step
 
     @property
     def min_input_shape(self) -> torch.Tensor:
         """
         `min_input_shape` is equal to the downsample factor for each dimension.
         """
-        return self.min_output_shape * self.invariant_step
+        return self.min_output_shape * self.equivariant_step
 
     @property
     def min_output_shape(self) -> torch.Tensor:
@@ -86,11 +86,11 @@ class Downsample(ContextAwareModule):
         :param x: the input tensor
         """
         for d in range(1, self.dims + 1):
-            if x.size()[-d] % self.invariant_step[-d] != 0:
+            if x.size()[-d] % self.equivariant_step[-d] != 0:
                 raise RuntimeError(
                     "Can not downsample shape %s with factor %s, mismatch "
                     "in spatial dimension %d"
-                    % (x.size(), self.invariant_step, self.dims - d)
+                    % (x.size(), self.equivariant_step, self.dims - d)
                 )
 
         return self.down(x)
@@ -118,7 +118,7 @@ class Upsample(ContextAwareModule):
         super().__init__()
 
         self._dims = dims
-        self._invariant_step = torch.tensor((1,) * self.dims) / torch.tensor(
+        self._equivariant_step = torch.tensor((1,) * self.dims) / torch.tensor(
             scale_factor
         )
         scale_factor = (
@@ -134,12 +134,12 @@ class Upsample(ContextAwareModule):
         return torch.tensor((0,) * self.dims)
 
     @property
-    def invariant_step(self) -> torch.Tensor:
+    def equivariant_step(self) -> torch.Tensor:
         """
         The invariant step is the inverse of the upsample factor for each dimension.
         A upsample factor of 4 means each pixel shift in the input shifts the output by 4 pixels.
         """
-        return self._invariant_step
+        return self._equivariant_step
 
     @property
     def min_input_shape(self) -> torch.Tensor:
@@ -153,7 +153,7 @@ class Upsample(ContextAwareModule):
         """
         `min_output_shape` is equal to the upsample factor for each dimension.
         """
-        return (self.min_input_shape / self.invariant_step).int()
+        return (self.min_input_shape / self.equivariant_step).int()
 
     @property
     def dims(self) -> int:

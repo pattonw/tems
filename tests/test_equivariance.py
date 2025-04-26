@@ -53,7 +53,7 @@ def test_translation_equivariance(eval_mode, downsample_factors):
         unet = unet.eval()
     min_output_shape = Coordinate(unet.min_output_shape)
     context = Coordinate(unet.context) // 2
-    downsampling = Coordinate(unet.invariant_step)
+    downsampling = Coordinate(unet.equivariant_step)
     blocks = Coordinate(1, 1) + downsampling / downsampling.gcd(
         min_output_shape
     ) * Coordinate(1, 0)

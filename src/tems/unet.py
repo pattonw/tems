@@ -51,7 +51,7 @@ class UNet(ContextAwareModule):
         # handle cropping to ensure translation equivariance
         # get all downsampling factors
         downsampling = [torch.tensor((1,) * dims)] + [
-            downsample.invariant_step for _, downsample, _, _ in levels
+            downsample.equivariant_step for _, downsample, _, _ in levels
         ]
         stacked_downsampling = torch.stack(downsampling)
         layer_downsampling = torch.cumprod(stacked_downsampling, dim=0)
@@ -94,11 +94,11 @@ class UNet(ContextAwareModule):
         return self.head_module.context
 
     @property
-    def invariant_step(self) -> torch.Tensor:
+    def equivariant_step(self) -> torch.Tensor:
         """
         The invariant step is the product of all downsampling factors.
         """
-        return self.head_module.invariant_step
+        return self.head_module.equivariant_step
 
     @property
     def min_input_shape(self) -> torch.Tensor:

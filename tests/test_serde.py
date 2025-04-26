@@ -90,10 +90,10 @@ def test_downsample(dims, downsample_factor, invalid_input, serde, tmp_path):
     downsample_loaded = serde(downsample, tmp_path)
 
     # get the invariant step
-    invariant_step = downsample.invariant_step
+    equivariant_step = downsample.equivariant_step
     if invalid_input:
         # generate invalid input data
-        in_data = torch.rand(1, 1, *(invariant_step + 1))
+        in_data = torch.rand(1, 1, *(equivariant_step + 1))
 
         # check that the models raise errors
         with pytest.raises(RuntimeError):
@@ -102,7 +102,7 @@ def test_downsample(dims, downsample_factor, invalid_input, serde, tmp_path):
             downsample_loaded(in_data)
     else:
         # generate valid input data
-        in_data = torch.rand(1, 1, *(invariant_step * 4))
+        in_data = torch.rand(1, 1, *(equivariant_step * 4))
 
         # process data
         out_data = downsample(in_data)
@@ -212,7 +212,7 @@ def test_umodule(
     expected_output_shape = (
         torch.tensor(in_shape)
         - in_conv_pass.context
-        - lower_block.context * downsample.invariant_step
+        - lower_block.context * downsample.equivariant_step
         - out_conv_pass.context
         - umodule.equivariance_context
     )

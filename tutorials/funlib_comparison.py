@@ -105,7 +105,7 @@ for downsample_factor, extra_input in zip(downsample_factors, extra_inputs):
     input_shape = unet.min_input_shape + torch.tensor(extra_input)
     funlib_unet = build_funlib_unet(downsample_factor).eval()
 
-    print("Total downsampling factor:", unet.invariant_step)
+    print("Total downsampling factor:", unet.equivariant_step)
     test_unet_comparison(unet, funlib_unet, input_shape)
     print()
 

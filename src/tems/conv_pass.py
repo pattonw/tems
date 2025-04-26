@@ -7,6 +7,19 @@ from .tem import ContextAwareModule
 
 
 class ConvPass(ContextAwareModule):
+    """
+    The ConvPass class wraps a series of convolutional layers with a limited set
+    of arguments. It is designed to be used with the UNet class and provides satisfies
+    the `ContextAwareModule` interface.
+
+    :param dims: the number of dimensions (1, 2, or 3)
+    :param in_channels: the number of input channels
+    :param out_channels: the number of output channels
+    :param kernel_sizes: a sequence of kernel sizes for each convolutional layer
+    :param activation: the activation function to use after each convolutional layer
+    :param padding: the padding mode to use for the convolutional layers
+    """
+
     _context: torch.Tensor
     _invariant_step: torch.Tensor
     _dims: int
@@ -18,7 +31,7 @@ class ConvPass(ContextAwareModule):
         out_channels: int = 1,
         kernel_sizes: Sequence[Sequence[int] | int] = (3, 3),
         activation: type[torch.nn.Module] = torch.nn.ReLU,
-        padding="valid",
+        padding: str = "valid",
     ):
         super().__init__()
 
@@ -72,23 +85,45 @@ class ConvPass(ContextAwareModule):
 
     @property
     def context(self) -> torch.Tensor:
+        """
+        The context of the ConvPass module.
+        Set to zero if the padding is "same".
+        Set to the sum of the [kernel_size - 1 for kernel_size in kernel_sizes] if the padding is "valid".
+        """
         return self._context
 
     @property
     def invariant_step(self) -> torch.Tensor:
+        """
+        Always 1 for ConvPass since we don't yet support strided convolutions.
+        """
         return self._invariant_step
 
     @property
     def min_input_shape(self) -> torch.Tensor:
+        """
+        Simply 1 + `self.context`.
+        """
         return self.min_output_shape + self._context
 
     @property
     def min_output_shape(self) -> torch.Tensor:
+        """
+        Always 1
+        """
         return torch.tensor((1,) * self.dims)
 
     @property
     def dims(self) -> int:
+        """
+        The number of dimensions of the ConvPass module.
+        """
         return self._dims
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """
+        Apply a series of convolutions to the input tensor.
+
+        :param x: the input tensor
+        """
         return self.conv_pass(x)

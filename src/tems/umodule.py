@@ -6,6 +6,20 @@ from .tem import ContextAwareModule
 
 
 class UModule(ContextAwareModule):
+    """
+    The UModule class is an abstraction of a single layer
+    of a UNet. It involves an input conv pass, a downsample,
+    a lower block, an upsample, and an output conv pass.
+    It is designed to be used with the UNet class and satisfies
+    the `ContextAwareModule` interface.
+
+    :param in_conv_pass: the input conv pass
+    :param downsample: the downsample layer
+    :param lower_block: the lower block
+    :param upsample: the upsample layer
+    :param out_conv_pass: the output
+    """
+
     equivariance_context: torch.Tensor
     _dims: int
     _invariant_step: torch.Tensor
@@ -48,10 +62,21 @@ class UModule(ContextAwareModule):
 
     @property
     def dims(self) -> int:
+        """
+        The number of dimensions (1, 2, or 3).
+        """
         return self._dims
 
     @property
     def context(self) -> torch.Tensor:
+        """
+        `in_conv_pass.context` + `downsample.invariant_step * lower_block.context`
+        + `out_conv_pass.context` + (Optional `equivariance_context`)
+
+        The equivariance context is only added during evaluation and is used to make
+        sure the network is translation equivariant for easy blockwise processing
+        without tiling artifacts.
+        """
         base_context = (
             self.in_conv_pass.context
             + self.downsample.invariant_step * self.lower_block.context
@@ -65,10 +90,16 @@ class UModule(ContextAwareModule):
 
     @property
     def invariant_step(self) -> torch.Tensor:
+        """
+        The invariant step is the product of the downsample factors.
+        """
         return self._invariant_step
 
     @property
     def min_input_shape(self) -> torch.Tensor:
+        """
+        The minimum input shape that this module can accept.
+        """
         # Some details about the lower block
         lower_block_input_shape = self.lower_block.min_input_shape
         lower_block_context = self.lower_block.context
@@ -98,14 +129,28 @@ class UModule(ContextAwareModule):
 
     @property
     def min_output_shape(self) -> torch.Tensor:
+        """
+        The minimum output shape that this module can produce.
+        `min_input_shape` - `context`
+        """
         return self.min_input_shape - self.context
 
     def set_equivariance_context(self, equivariance_context: torch.Tensor):
+        """
+        Set the equivariance context to be used during evaluation.
+
+        :param equivariance_context: the equivariance context per dimension
+        """
         self.equivariance_context = equivariance_context
 
     @torch.jit.export
     def crop(self, x: torch.Tensor, shape: torch.Tensor) -> torch.Tensor:
-        """Center-crop x to match spatial dimensions given by shape."""
+        """
+        Center-crop x to match spatial dimensions given by shape.
+
+        :param x: the input tensor
+        :param shape: the target shape
+        """
 
         x_shape = x.size()[2:]
         offset = (torch.tensor(x_shape) - shape) // 2
@@ -113,7 +158,12 @@ class UModule(ContextAwareModule):
             x = torch.slice_copy(x, i + 2, o.item(), o.item() + s)
         return x
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """
+        Apply the UModule to the input tensor.
+
+        :param x: the input tensor
+        """
         # simple processing
         f_in = self.in_conv_pass(x)
         g_in = self.downsample(f_in)

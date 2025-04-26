@@ -64,3 +64,6 @@ html_static_path = ["_static"]
 html_css_files = [
     "css/custom.css",
 ]
+
+typehints_fully_qualified = False  # Show types like `List` instead of `typing.List`
+typehints_format = 'short'         # Options: 'short', 'fully-qualified', 'none'

@@ -16,6 +16,11 @@ class UNet(ContextAwareModule):
 
     This UNet is also fully scriptable with `torch.jit.script` making
     it easy to share and deploy.
+
+    :param dims: the number of dimensions
+    :param bottleneck: the bottleneck module
+    :param levels: a sequence of tuples containing the left conv pass,
+        downsample, upsample, and right conv pass for each level
     """
 
     _dims: int
@@ -76,25 +81,45 @@ class UNet(ContextAwareModule):
 
     @property
     def dims(self) -> int:
+        """
+        The number of dimensions (1, 2, or 3).
+        """
         return self._dims
 
     @property
     def context(self) -> torch.Tensor:
+        """
+        The context of the UNet.
+        """
         return self.head_module.context
 
     @property
     def invariant_step(self) -> torch.Tensor:
+        """
+        The invariant step is the product of all downsampling factors.
+        """
         return self.head_module.invariant_step
 
     @property
     def min_input_shape(self) -> torch.Tensor:
+        """
+        The minimum input shape that this module can accept.
+        """
         return self.head_module.min_input_shape
 
     @property
     def min_output_shape(self) -> torch.Tensor:
+        """
+        The minimum output shape that this module can produce.
+        """
         return self.head_module.min_output_shape
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """
+        Apply the UNet to the input tensor.
+
+        :param x: the input tensor
+        """
         return self.head_module(x)
 
     @classmethod
@@ -113,6 +138,24 @@ class UNet(ContextAwareModule):
         constant_upsample: bool = False,
         padding: str = "valid",
     ):
+        """
+        A helper method to match the API of the funlib UNet as closely as possible.
+        This method is helpful to creating a UNet with a more compact API whereas
+        the default constructor makes you define every layer explicitly.
+
+        :param dims: the number of dimensions
+        :param in_channels: the number of input channels
+        :param num_fmaps: the number of feature maps
+        :param fmap_inc_factor: the factor by which to increase the number of feature maps
+        :param downsample_factors: the downsample factors for each level
+        :param kernel_size_down: the kernel size for the downsample convolutions
+        :param kernel_size_up: the kernel size for the upsample convolutions
+        :param activation: the activation function to use
+        :param num_fmaps_out: the number of output feature maps
+        :param num_heads: the number of heads to use
+        :param constant_upsample: whether to use constant upsampling
+        :param padding: the padding mode to use. Supported values are "valid" and "same".
+        """
         _activation: type[torch.nn.Module] = getattr(torch.nn, activation)
         kernel_size_up = (
             kernel_size_up

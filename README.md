@@ -4,7 +4,6 @@
 [![mypy](https://github.com/pattonw/tems/actions/workflows/mypy.yaml/badge.svg)](https://github.com/pattonw/tems/actions/workflows/mypy.yaml)
 
 [![pypi](https://img.shields.io/pypi/v/tems.svg)](https://pypi.python.org/pypi/tems)
-[![python](https://img.shields.io/pypi/pyversions/tems.svg)](https://pypi.python.org/pypi/tems)
 
 # Translation Equivariant ModelS (tems)
 

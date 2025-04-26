@@ -12,11 +12,11 @@
 - It is surprisingly annoying to make a UNet function with `torch.jit.script` for easy packaging and sharing. All models in this library are tested for serlializaiton/deserialization with `torch.jit.script`
 - All models in this library have some helpful properties:
     - `min_input_shape` - the minimum amount of data that can be passed through a model
-    - min_output_shape - the output shape when given data with shape: `min_input_shape`
+    - `min_output_shape` - the output shape when given data with shape: `min_input_shape`
     - `context` - (`input_shape` - `output_shape`)
     - `equivariant_step` - The minimum value by which you must increase the input shape to be able to process without error
 - All models are translation equivariant **when in eval mode and with padding="valid"**
-    - To maintain translation equivariance, we sometimes need to crop more aggressively. This is only done in `eval` mode since it is assumed you will not be processing data blockwise during training. Note that `min_input_shape`, `min_output_shape`, and `context` will thus all change when the model is moved between modes.
+    - To maintain translation equivariance, we sometimes need to crop more aggressively. This is only done in `eval` mode since it is assumed you will not be processing data blockwise during training. Note that `min_input_shape`, `min_output_shape`, and `context` will thus all change when the model is switched between modes.
     - This behaviour is explicitly tested and shown to be true s.t. while training, blockwise processing is not the same as full in memmory operations, wheras while in eval mode, this identity holds.
     - Crops to maintain translation equivariance are minimal to maximize the efficiency of blockwise processing with these models.
 - Nice simple pure torch implementation. No other dependencies.

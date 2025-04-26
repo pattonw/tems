@@ -114,5 +114,6 @@ for downsample_factor, extra_input in zip(downsample_factors, extra_inputs):
 # Because we compute the necessary input/output shapes of every component
 # in the UNet, we can check what the globally minimal crop is, and then apply
 # only that crop at whatever point in the network it is most efficient.
-# The funlib UNet builds layer by layer and identifies whatever crop is needed
-# to keep each level of the UNet translation equivariant. This is overkill.
+# The funlib UNet builds layer by layer and seems to identify whatever crop
+# is needed to keep each level of the UNet translation equivariant, rather than
+# just the top level.

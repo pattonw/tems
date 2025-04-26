@@ -26,15 +26,14 @@ downsample_factors = [
     [[2, 1], [4, 1], [3, 1], [5, 1]],
 ]
 # The extra input is necessary because the funlib UNet crops more aggressively
-# than the tems UNet, thus has a larger `min_input_shape`.
+# than the tems UNet, thus has a larger `min_input_shape`. These were found via manual
+# guess and check. Figuring out the appropriate input shape for the funlib UNet is not
+# always easy.
 extra_inputs = [
     (16, 0),
     (48 * 2, 0),
     (120 * 2, 0),
 ]
-# note that just because the downsampling is only applied in 1 dimension,
-# the convolutional kernels are still [3,3] by default, so the input shape
-# will not be completely 1 dimensional.
 
 
 # %%
@@ -69,16 +68,16 @@ unet = build_unet(downsample_factors[0])
 try:
     torch.jit.script(unet)
     print("Successfully scripted tems.UNet")
-except RuntimeError as e:
-    print("Failed to script tems.UNet:", e)
+except RuntimeError:
+    print("Failed to script tems.UNet")
 
 # %%
 funlib_unet = build_funlib_unet(downsample_factors[0])
 try:
     torch.jit.script(funlib_unet)
     print("Successfully scripted funlib.UNet")
-except RuntimeError as e:
-    print("Failed to script funlib.UNet:", e)
+except RuntimeError:
+    print("Failed to script funlib.UNet")
 
 
 # %% [markdown]

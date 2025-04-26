@@ -3,7 +3,12 @@
 [![ruff](https://github.com/pattonw/tems/actions/workflows/ruff.yaml/badge.svg)](https://github.com/pattonw/tems/actions/workflows/ruff.yaml)
 [![mypy](https://github.com/pattonw/tems/actions/workflows/mypy.yaml/badge.svg)](https://github.com/pattonw/tems/actions/workflows/mypy.yaml)
 
+[![pypi](https://img.shields.io/pypi/v/pyn5.svg)](https://pypi.python.org/pypi/pyn5)
+[![python](https://img.shields.io/pypi/pyversions/pyn5.svg)](https://pypi.python.org/pypi/pyn5)
+
 # Translation Equivariant ModelS (tems)
+
+See the docs [here](pattonw.github.io/tems)
 
 ## Available Models
 - UNet

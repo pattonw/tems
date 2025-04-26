@@ -37,15 +37,15 @@ docs = [
     "jupytext>=1.16.7",
 ]
 
+[tool.setuptools.package-data]
+tems = ["py.typed"]
+
 [tool.ruff]
 # pyflakes, pycodestyle, isort
 lint.select = ["F", "W", "I001"]
 
 [tool.uv.sources]
 funlib-learn-torch = { git = "https://github.com/funkelab/funlib.learn.torch" }
-
-[tool.setuptools.package-data]
-"funlib.learn.torch" = ["py.typed"]
 
 [[tool.mypy.overrides]]
 module = [

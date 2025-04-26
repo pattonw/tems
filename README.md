@@ -8,7 +8,7 @@
 
 # Translation Equivariant ModelS (tems)
 
-See the docs [here](pattonw.github.io/tems)
+See the docs [here](https://pattonw.github.io/tems)
 
 ## Available Models
 - UNet

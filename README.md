@@ -8,8 +8,8 @@
 ## Available Models
 - UNet
 
-## Why use this UNet
-- It is surprisingly annoying to make a UNet function with `torch.jit.script` for easy packaging and sharing. All models in this library are tested for serlializaiton/deserialization with `torch.jit.script`
+## Why use these Models
+- It is surprisingly annoying to make a torch modules that are compatible with `torch.jit.script` for easy packaging and sharing. All models in this library are tested for serlializaiton/deserialization with `torch.jit.script`
 - All models in this library have some helpful properties:
     - `min_input_shape` - the minimum amount of data that can be passed through a model
     - `min_output_shape` - the output shape when given data with shape: `min_input_shape`

@@ -156,6 +156,7 @@ def test_upsample(dims, scale_factor, mode, serde, tmp_path):
         ),
     ],
 )
+@pytest.mark.parametrize("residuals", [True, False])
 @pytest.mark.parametrize("serde", [identity, save_load, jit_script, jit_save_load])
 def test_umodule(
     in_shape,
@@ -165,6 +166,7 @@ def test_umodule(
     upsample,
     out_conv_pass,
     equivariance_context,
+    residuals,
     serde,
     tmp_path,
 ):
@@ -175,6 +177,7 @@ def test_umodule(
         lower_block=lower_block,
         upsample=upsample,
         out_conv_pass=out_conv_pass,
+        residuals=residuals,
         _equivariance_context=torch.tensor(equivariance_context),
     )
     umodule_loaded = serde(umodule, tmp_path)
@@ -254,9 +257,10 @@ def test_umodule(
         ),
     ],
 )
+@pytest.mark.parametrize("residuals", [True, False])
 @pytest.mark.parametrize("serde", [identity, save_load, jit_script, jit_save_load])
-def test_unet(dims, bottleneck, levels, serde, tmp_path):
-    unet = UNet(dims=dims, bottleneck=bottleneck, levels=levels)
+def test_unet(dims, bottleneck, levels, residuals, serde, tmp_path):
+    unet = UNet(dims=dims, bottleneck=bottleneck, levels=levels, residuals=residuals)
     unet_loaded = serde(unet, tmp_path)
 
     # generate input data

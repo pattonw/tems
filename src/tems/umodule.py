@@ -22,6 +22,7 @@ class UModule(ContextAwareModule):
     """
 
     equivariance_context: torch.Tensor
+    residuals: bool
     _dims: int
     _equivariant_step: torch.Tensor
 
@@ -63,21 +64,24 @@ class UModule(ContextAwareModule):
         self.lower_block = lower_block
         self.upsample = upsample
         self.out_conv_pass = out_conv_pass
-        if residuals:
-            self.in_residual = ConvPass(
-                in_conv_pass.dims,
-                in_conv_pass.in_channels,
-                in_conv_pass.out_channels,
-                [1],
-                activation=torch.nn.Identity,
-            )
-            self.out_residual = ConvPass(
-                out_conv_pass.dims,
-                out_conv_pass.in_channels,
-                out_conv_pass.out_channels,
-                [1],
-                activation=torch.nn.Identity,
-            )
+        self.residuals = residuals
+
+        # we don't need the residual layers if residuals=False
+        # but then jit scripting seems to break
+        self.in_residual = ConvPass(
+            in_conv_pass.dims,
+            in_conv_pass.in_channels,
+            in_conv_pass.out_channels,
+            [1],
+            activation=torch.nn.Identity,
+        )
+        self.out_residual = ConvPass(
+            out_conv_pass.dims,
+            out_conv_pass.in_channels,
+            out_conv_pass.out_channels,
+            [1],
+            activation=torch.nn.Identity,
+        )
 
     @property
     def dims(self) -> int:
@@ -186,7 +190,7 @@ class UModule(ContextAwareModule):
         # simple processing
         f_in = self.in_conv_pass(x)
         if self.residuals:
-            f_in = f_in + self.crop(self.in_residual(x), f_in.size()[-self.dims:])
+            f_in = f_in + self.crop(self.in_residual(x), torch.tensor(f_in.size()[-self.dims:]))
         g_in = self.downsample(f_in)
         g_out = self.lower_block(g_in)
         f_in_up = self.upsample(g_out)
@@ -202,5 +206,5 @@ class UModule(ContextAwareModule):
         # final conv pass
         y = self.out_conv_pass(f_in_cat)
         if self.residuals:
-            y = y + self.crop(self.in_residual(f_in_cat), y.size()[-self.dims:])
+            y = y + self.crop(self.out_residual(f_in_cat), torch.tensor(y.size()[-self.dims:]))
         return y

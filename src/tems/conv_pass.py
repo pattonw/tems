@@ -35,6 +35,9 @@ class ConvPass(ContextAwareModule):
     ):
         super().__init__()
 
+        self.in_channels = in_channels
+        self.out_channels = out_channels
+
         self._dims = dims
         self._context = torch.tensor((0,) * dims)
         self._equivariant_step = torch.tensor((1,) * dims)

@@ -21,6 +21,8 @@ class UNet(ContextAwareModule):
     :param bottleneck: the bottleneck module
     :param levels: a sequence of tuples containing the left conv pass,
         downsample, upsample, and right conv pass for each level
+    :param residuals: whether or not to add residual connections around
+        each conv block.
     """
 
     _dims: int
@@ -30,6 +32,7 @@ class UNet(ContextAwareModule):
         dims: int,
         bottleneck: ContextAwareModule,
         levels: Sequence[tuple[ConvPass, Downsample, Upsample, ConvPass]],
+        residuals: bool = False
     ):
         super().__init__()
 
@@ -43,6 +46,7 @@ class UNet(ContextAwareModule):
                 lower_block=head_module if head_module is not None else bottleneck,
                 upsample=up,
                 out_conv_pass=right,
+                residuals=residuals
             )
         assert head_module is not None, "0 level UNet not supported"
 
@@ -137,6 +141,7 @@ class UNet(ContextAwareModule):
         num_heads: int = 1,
         constant_upsample: bool = False,
         padding: str = "valid",
+        residuals: bool = False,
     ):
         """
         A helper method to match the API of the funlib UNet as closely as possible.
@@ -155,6 +160,7 @@ class UNet(ContextAwareModule):
         :param num_heads: the number of heads to use
         :param constant_upsample: whether to use constant upsampling
         :param padding: the padding mode to use. Supported values are "valid" and "same".
+        :param residuals: whether to use residual connections
         """
         _activation: type[torch.nn.Module] = getattr(torch.nn, activation)
         kernel_size_up = (
@@ -215,5 +221,6 @@ class UNet(ContextAwareModule):
             kernel_sizes=bottleneck_kernel,
             activation=_activation,
             padding=padding,
+            residual=residuals
         )
-        return UNet(dims, bottleneck, layers)
+        return UNet(dims, bottleneck, layers, residuals=residuals)

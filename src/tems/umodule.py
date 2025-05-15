@@ -18,6 +18,7 @@ class UModule(ContextAwareModule):
     :param lower_block: the lower block
     :param upsample: the upsample layer
     :param out_conv_pass: the output
+    :param residuals: whether or not add residual layers around conv passes
     """
 
     equivariance_context: torch.Tensor
@@ -31,11 +32,14 @@ class UModule(ContextAwareModule):
         lower_block: ContextAwareModule,
         upsample: Upsample,
         out_conv_pass: ConvPass,
+        residuals: bool = False,
         _equivariance_context: torch.Tensor | None = None,
     ):
         super().__init__()
         self._dims = in_conv_pass.dims
-        self._equivariant_step = downsample.equivariant_step * lower_block.equivariant_step
+        self._equivariant_step = (
+            downsample.equivariant_step * lower_block.equivariant_step
+        )
         assert torch.equal(
             downsample.equivariant_step * upsample.equivariant_step,
             torch.tensor((1,) * self.dims),
@@ -59,6 +63,21 @@ class UModule(ContextAwareModule):
         self.lower_block = lower_block
         self.upsample = upsample
         self.out_conv_pass = out_conv_pass
+        if residuals:
+            self.in_residual = ConvPass(
+                in_conv_pass.dims,
+                in_conv_pass.in_channels,
+                in_conv_pass.out_channels,
+                [1],
+                activation=torch.nn.Identity,
+            )
+            self.out_residual = ConvPass(
+                out_conv_pass.dims,
+                out_conv_pass.in_channels,
+                out_conv_pass.out_channels,
+                [1],
+                activation=torch.nn.Identity,
+            )
 
     @property
     def dims(self) -> int:
@@ -166,6 +185,8 @@ class UModule(ContextAwareModule):
         """
         # simple processing
         f_in = self.in_conv_pass(x)
+        if self.residuals:
+            f_in = f_in + self.crop(self.in_residual(x), f_in.size()[-self.dims:])
         g_in = self.downsample(f_in)
         g_out = self.lower_block(g_in)
         f_in_up = self.upsample(g_out)
@@ -180,4 +201,6 @@ class UModule(ContextAwareModule):
 
         # final conv pass
         y = self.out_conv_pass(f_in_cat)
+        if self.residuals:
+            y = y + self.crop(self.in_residual(f_in_cat), y.size()[-self.dims:])
         return y

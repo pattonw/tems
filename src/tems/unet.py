@@ -47,7 +47,6 @@ class UNet(ContextAwareModule):
                 lower_block=head_module if head_module is not None else bottleneck,
                 upsample=up,
                 out_conv_pass=right,
-                residuals=residuals,
             )
         assert head_module is not None, "0 level UNet not supported"
 

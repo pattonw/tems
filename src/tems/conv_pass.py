@@ -5,6 +5,7 @@ import torch
 from torch.nn import Conv1d, Conv2d, Conv3d
 
 from .tem import ContextAwareModule
+from .utils import crop
 
 
 class ConvPass(ContextAwareModule):
@@ -24,6 +25,7 @@ class ConvPass(ContextAwareModule):
     _context: torch.Tensor
     _equivariant_step: torch.Tensor
     _dims: int
+    residual: bool
 
     def __init__(
         self,
@@ -33,11 +35,13 @@ class ConvPass(ContextAwareModule):
         kernel_sizes: Sequence[Sequence[int] | int] = (3, 3),
         activation: type[torch.nn.Module] = torch.nn.ReLU,
         padding: str = "valid",
+        residual: bool = False,
     ):
         super().__init__()
 
         self.in_channels = in_channels
         self.out_channels = out_channels
+        self.residual = residual
 
         self._dims = dims
         self._context = torch.tensor((0,) * dims)
@@ -99,6 +103,16 @@ class ConvPass(ContextAwareModule):
                 layers.append(activation())
 
         self.conv_pass = torch.nn.Sequential(*layers)
+        self.residual_layer = (
+            torch.nn.Identity()
+            if (not residual or in_channels == out_channels)
+            else torch.nn.Conv1d(
+                in_channels,
+                out_channels,
+                kernel_size=1,
+                padding=0,
+            )
+        )
 
     @property
     def context(self) -> torch.Tensor:
@@ -143,4 +157,8 @@ class ConvPass(ContextAwareModule):
 
         :param x: the input tensor
         """
-        return self.conv_pass(x)
+        if self.residual:
+            y = self.conv_pass(x)
+            return y + crop(self.residual_layer(x), torch.tensor(y.shape[2:]))
+        else:
+            return self.conv_pass(x)

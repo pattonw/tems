@@ -149,7 +149,7 @@ class UNet(ContextAwareModule):
         activation: str = "ReLU",
         num_fmaps_out: int | None = None,
         num_heads: int = 1,
-        constant_upsample: bool = False,
+        constant_upsample: bool = True,
         padding: str = "valid",
         residuals: bool = False,
     ):
@@ -172,6 +172,11 @@ class UNet(ContextAwareModule):
         :param padding: the padding mode to use. Supported values are "valid" and "same".
         :param residuals: whether to use residual connections
         """
+        if num_fmaps_out is not None or num_heads != 1 or not constant_upsample:
+            raise NotImplementedError(
+                "num_fmaps_out, num_heads, and non constant upsample not yet supported!"
+            )
+
         _activation: type[torch.nn.Module] = getattr(torch.nn, activation)
         kernel_size_up = (
             kernel_size_up

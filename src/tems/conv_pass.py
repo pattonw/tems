@@ -1,11 +1,10 @@
+import warnings
 from typing import Any, Sequence
 
 import torch
 from torch.nn import Conv1d, Conv2d, Conv3d
 
 from .tem import ContextAwareModule
-
-import warnings
 
 
 class ConvPass(ContextAwareModule):
@@ -79,11 +78,15 @@ class ConvPass(ContextAwareModule):
                     "Using Identity activation with the ConvPass module is assumed to be a test case. "
                     "The convolutional layer will be initialized with constants."
                 )
-                constant = 1.0 / (
-                    torch.prod(torch.tensor(kernel_size))
-                    if isinstance(kernel_size, Sequence)
-                    else kernel_size**dims
-                ) / in_channels
+                constant = (
+                    1.0
+                    / (
+                        torch.prod(torch.tensor(kernel_size))
+                        if isinstance(kernel_size, Sequence)
+                        else kernel_size**dims
+                    )
+                    / in_channels
+                )
                 torch.nn.init.constant_(conv_layer.weight, constant)
             layers.append(conv_layer)
 

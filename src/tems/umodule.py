@@ -190,7 +190,9 @@ class UModule(ContextAwareModule):
         # simple processing
         f_in = self.in_conv_pass(x)
         if self.residuals:
-            f_in = f_in + self.crop(self.in_residual(x), torch.tensor(f_in.size()[-self.dims:]))
+            f_in = f_in + self.crop(
+                self.in_residual(x), torch.tensor(f_in.size()[-self.dims :])
+            )
         g_in = self.downsample(f_in)
         g_out = self.lower_block(g_in)
         f_in_up = self.upsample(g_out)
@@ -206,5 +208,7 @@ class UModule(ContextAwareModule):
         # final conv pass
         y = self.out_conv_pass(f_in_cat)
         if self.residuals:
-            y = y + self.crop(self.out_residual(f_in_cat), torch.tensor(y.size()[-self.dims:]))
+            y = y + self.crop(
+                self.out_residual(f_in_cat), torch.tensor(y.size()[-self.dims :])
+            )
         return y

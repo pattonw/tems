@@ -1,3 +1,4 @@
+import warnings
 from typing import Sequence
 
 import torch
@@ -6,8 +7,6 @@ from .conv_pass import ConvPass
 from .scale import Downsample, Upsample
 from .tem import ContextAwareModule
 from .umodule import UModule
-
-import warnings
 
 
 class UNet(ContextAwareModule):

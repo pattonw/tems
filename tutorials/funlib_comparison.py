@@ -83,6 +83,7 @@ except RuntimeError:
 # %% [markdown]
 # ## Cropping
 
+
 # %%
 def test_unet_comparison(tems_unet: UNet, funlib_unet: FunlibUNet, input_shape):
     in_data = torch.rand(1, 1, *(input_shape))
@@ -108,4 +109,3 @@ for downsample_factor, extra_input in zip(downsample_factors, extra_inputs):
     print("Total downsampling factor:", unet.equivariant_step)
     test_unet_comparison(unet, funlib_unet, input_shape)
     print()
-

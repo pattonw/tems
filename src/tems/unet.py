@@ -7,6 +7,8 @@ from .scale import Downsample, Upsample
 from .tem import ContextAwareModule
 from .umodule import UModule
 
+import warnings
+
 
 class UNet(ContextAwareModule):
     """
@@ -32,7 +34,7 @@ class UNet(ContextAwareModule):
         dims: int,
         bottleneck: ContextAwareModule,
         levels: Sequence[tuple[ConvPass, Downsample, Upsample, ConvPass]],
-        residuals: bool = False
+        residuals: bool = False,
     ):
         super().__init__()
 
@@ -46,7 +48,7 @@ class UNet(ContextAwareModule):
                 lower_block=head_module if head_module is not None else bottleneck,
                 upsample=up,
                 out_conv_pass=right,
-                residuals=residuals
+                residuals=residuals,
             )
         assert head_module is not None, "0 level UNet not supported"
 
@@ -124,6 +126,15 @@ class UNet(ContextAwareModule):
 
         :param x: the input tensor
         """
+        output_shape = torch.tensor(x.shape[2:]) - self.head_module.context
+        if any(output_shape < self.equivariant_step):
+            warnings.warn(
+                f"Output shape {output_shape} is smaller than the equivariant step {self.equivariant_step}. "
+                "This may lead to visible patch artifacts with period equal to the downsampling factor when "
+                "attempting to predict on larger regions. See this paper for more details: "
+                "https://openaccess.thecvf.com/content/ICCV2021/papers/Rumberger_How_Shift_Equivariance_Impacts_Metric_Learning_for_Instance_Segmentation_ICCV_2021_paper.pdf",
+            )
+
         return self.head_module(x)
 
     @classmethod

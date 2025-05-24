@@ -221,6 +221,5 @@ class UNet(ContextAwareModule):
             kernel_sizes=bottleneck_kernel,
             activation=_activation,
             padding=padding,
-            residual=residuals
         )
         return UNet(dims, bottleneck, layers, residuals=residuals)

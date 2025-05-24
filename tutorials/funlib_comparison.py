@@ -6,7 +6,7 @@
 # We specifically compare
 # - the constructors to show that it is a very easy migration.
 # - funlib.UNet fails `torch.jit.script`.
-# - funlib.UNet crops unnecessarily aggressively to maintain translation equivariance.
+# - funlib.UNet crops more aggressively to maintain translation equivariance.
 
 # %% [markdown]
 # ## Setup
@@ -28,7 +28,7 @@ downsample_factors = [
 # The extra input is necessary because the funlib UNet crops more aggressively
 # than the tems UNet, thus has a larger `min_input_shape`. These were found via manual
 # guess and check. Figuring out the appropriate input shape for the funlib UNet is not
-# always easy.
+# always easy and one of the main motivators for `tems`.
 extra_inputs = [
     (16, 0),
     (48 * 2, 0),
@@ -109,11 +109,3 @@ for downsample_factor, extra_input in zip(downsample_factors, extra_inputs):
     test_unet_comparison(unet, funlib_unet, input_shape)
     print()
 
-# %% [markdown]
-# How are we cropping less and maintaining translation equivariance?
-# Because we compute the necessary input/output shapes of every component
-# in the UNet, we can check what the globally minimal crop is, and then apply
-# only that crop at whatever point in the network it is most efficient.
-# The funlib UNet builds layer by layer and seems to identify whatever crop
-# is needed to keep each level of the UNet translation equivariant, rather than
-# just the top level.

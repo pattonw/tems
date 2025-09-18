@@ -106,7 +106,7 @@ class ConvPass(ContextAwareModule):
         self.residual_layer = (
             torch.nn.Identity()
             if (not residual or self.in_channels == self.out_channels)
-            else torch.nn.Conv1d(
+            else conv(
                 self.in_channels,
                 self.out_channels,
                 kernel_size=1,

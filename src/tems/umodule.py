@@ -113,6 +113,8 @@ class UModule(ContextAwareModule):
             lower_block_output_shape / self.upsample.equivariant_step
         ).long()
         min_out = min_lower_output - self.out_conv_pass.context
+        if not self.training:
+            min_out -= self.equivariance_context
 
         # min_out could be negative. We want it to be at least [1,1]
         min_expansion = torch.tensor([1] * self.dims) - min_out

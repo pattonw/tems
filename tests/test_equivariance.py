@@ -24,7 +24,7 @@ def gcd_coord(self: Coordinate, other: Coordinate):
     """
     Compute the greatest common divisor of two coordinates.
     """
-    return Coordinate(*[gcd(a, b) for a, b in zip(self, other)])
+    return Coordinate(*[gcd(a, b) for a, b in zip(self, other, strict=False)])
 
 
 Coordinate.gcd = gcd_coord
@@ -62,13 +62,11 @@ def test_translation_equivariance(eval_mode, downsample_factors, initialize_weig
 
     in_array = Array(
         np.arange(
-            (
-                in_channels
-                * min_output_shape[0]
-                * min_output_shape[1]
-                * blocks[0]
-                * blocks[1]
-            )
+            in_channels
+            * min_output_shape[0]
+            * min_output_shape[1]
+            * blocks[0]
+            * blocks[1]
         ).reshape(1, in_channels, *(min_output_shape * blocks)),
         voxel_size=(1,) * len(min_output_shape),
     )

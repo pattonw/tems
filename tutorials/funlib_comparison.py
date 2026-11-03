@@ -101,7 +101,9 @@ def test_unet_comparison(tems_unet: UNet, funlib_unet: FunlibUNet, input_shape):
 
 # %%
 
-for downsample_factor, extra_input in zip(downsample_factors, extra_inputs):
+for downsample_factor, extra_input in zip(
+    downsample_factors, extra_inputs, strict=False
+):
     unet = build_unet(downsample_factor).eval()
     input_shape = unet.min_input_shape + torch.tensor(extra_input)
     funlib_unet = build_funlib_unet(downsample_factor).eval()

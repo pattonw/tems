@@ -1,6 +1,7 @@
 import math
 import warnings
-from typing import Any, Sequence
+from collections.abc import Sequence
+from typing import Any
 
 import torch
 from torch.nn import Conv1d, Conv2d, Conv3d

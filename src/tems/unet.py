@@ -1,5 +1,5 @@
 import warnings
-from typing import Sequence
+from collections.abc import Sequence
 
 import torch
 
@@ -204,6 +204,7 @@ class UNet(ContextAwareModule):
                 kernel_size_down,
                 downsample_factors,
                 kernel_size_up,
+                strict=False,
             )
         ):
             layers.append(

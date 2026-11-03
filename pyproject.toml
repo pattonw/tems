@@ -49,10 +49,6 @@ docs = [
     "jupytext>=1.16.7",
 ]
 
-[tool.ruff]
-# pyflakes, pycodestyle, isort
-lint.select = ["F", "W", "I001"]
-
 [tool.uv.sources]
 funlib-learn-torch = { git = "https://github.com/funkelab/funlib.learn.torch" }
 
@@ -61,3 +57,16 @@ module = [
     "funlib.learn.torch.*",
 ]
 ignore_missing_imports = true
+
+[tool.ruff]
+line-length = 88
+extend-exclude = ["docs/build"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B"]
+ignore = ["E501"]  # the formatter owns line length
+
+[tool.ruff.lint.per-file-ignores]
+"tutorials/**/*.py" = ["E402"]  # jupytext cells import mid-file
+"examples/**/*.py" = ["E402"]
+"__init__.py" = ["F401"]  # re-exports

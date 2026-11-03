@@ -151,6 +151,7 @@ class UNet(ContextAwareModule):
         constant_upsample: bool = True,
         padding: str = "valid",
         residuals: bool = False,
+        initialize_weights: bool = True,
     ):
         """
         A helper method to match the API of the funlib UNet as closely as possible.
@@ -170,6 +171,8 @@ class UNet(ContextAwareModule):
         :param constant_upsample: whether to use constant upsampling
         :param padding: the padding mode to use. Supported values are "valid" and "same".
         :param residuals: whether to use residual connections
+        :param initialize_weights: initialize conv weights based on the activation.
+            If False, the torch default initialization is kept.
         """
         if num_fmaps_out is not None or num_heads != 1 or not constant_upsample:
             raise NotImplementedError(
@@ -214,6 +217,7 @@ class UNet(ContextAwareModule):
                         kernel_sizes=kernel_down,
                         activation=_activation,
                         padding=padding,
+                        initialize_weights=initialize_weights,
                     ),
                     Downsample(dims, scale_factor),
                     Upsample(dims, scale_factor),
@@ -225,6 +229,7 @@ class UNet(ContextAwareModule):
                         kernel_sizes=kernel_up,
                         activation=_activation,
                         padding=padding,
+                        initialize_weights=initialize_weights,
                     ),
                 )
             )
@@ -235,5 +240,6 @@ class UNet(ContextAwareModule):
             kernel_sizes=bottleneck_kernel,
             activation=_activation,
             padding=padding,
+            initialize_weights=initialize_weights,
         )
         return UNet(dims, bottleneck, layers, residuals=residuals)

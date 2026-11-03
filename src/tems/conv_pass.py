@@ -1,8 +1,10 @@
+import math
 import warnings
 from typing import Any, Sequence
 
 import torch
 from torch.nn import Conv1d, Conv2d, Conv3d
+from torch.nn.modules.conv import _ConvNd
 
 from .tem import ContextAwareModule
 from .utils import crop
@@ -99,7 +101,7 @@ class ConvPass(ContextAwareModule):
 
     def _initialize_conv(
         self,
-        conv_layer: torch.nn.Module,
+        conv_layer: _ConvNd,
         kernel_size: Sequence[int],
         in_channels: int,
         activation: type[torch.nn.Module] | None,
@@ -125,7 +127,7 @@ class ConvPass(ContextAwareModule):
                 "to be a test case. The convolutional layer will be initialized "
                 "with constants."
             )
-            constant = 1.0 / torch.prod(torch.tensor(kernel_size)) / in_channels
+            constant = 1.0 / math.prod(kernel_size) / in_channels
             torch.nn.init.constant_(conv_layer.weight, constant)
 
     @property

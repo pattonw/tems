@@ -30,6 +30,7 @@ def gcd_coord(self: Coordinate, other: Coordinate):
 Coordinate.gcd = gcd_coord
 
 
+@pytest.mark.parametrize("initialize_weights", [True, False])
 @pytest.mark.parametrize("eval_mode", [True, False])
 @pytest.mark.parametrize(
     "downsample_factors",
@@ -39,7 +40,7 @@ Coordinate.gcd = gcd_coord
         [[2, 1], [4, 1], [3, 1], [5, 1]],
     ],
 )
-def test_translation_equivariance(eval_mode, downsample_factors):
+def test_translation_equivariance(eval_mode, downsample_factors, initialize_weights):
     in_channels, out_channels = 1, 1
     unet = UNet.funlib_api(
         dims=2,
@@ -48,6 +49,7 @@ def test_translation_equivariance(eval_mode, downsample_factors):
         fmap_inc_factor=1,
         downsample_factors=downsample_factors,
         activation="Identity",
+        initialize_weights=initialize_weights,
     )
     if eval_mode:
         unet = unet.eval()

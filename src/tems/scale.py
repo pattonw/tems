@@ -88,9 +88,9 @@ class Downsample(ContextAwareModule):
         for d in range(1, self.dims + 1):
             if x.size()[-d] % self.equivariant_step[-d] != 0:
                 raise RuntimeError(
-                    "Can not downsample shape %s with factor %s, mismatch "
-                    "in spatial dimension %d"
-                    % (x.size(), self.equivariant_step, self.dims - d)
+                    f"Can not downsample shape {x.size()} with factor "
+                    f"{self.equivariant_step}, mismatch in spatial dimension "
+                    f"{self.dims - d}"
                 )
 
         return self.down(x)

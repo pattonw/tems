@@ -126,7 +126,8 @@ class ConvPass(ContextAwareModule):
             warnings.warn(
                 "Using Identity activation with the ConvPass module is assumed "
                 "to be a test case. The convolutional layer will be initialized "
-                "with constants."
+                "with constants.",
+                stacklevel=2,
             )
             constant = 1.0 / math.prod(kernel_size) / in_channels
             torch.nn.init.constant_(conv_layer.weight, constant)

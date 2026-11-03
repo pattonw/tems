@@ -37,8 +37,10 @@ def jit_save_load(module: torch.nn.Module, tmp_path) -> torch.nn.Module:
         (2, 2, 3, [(3, 3, 3)], torch.nn.ReLU, "same"),
         (4, 4, 3, ((5, 5, 5), (3, 3, 3)), torch.nn.LeakyReLU, "valid"),
         (8, 8, 2, [7, [3, 3]], torch.nn.Sigmoid, "same"),
+        (1, 2, 2, [3, 3], None, "valid"),
     ],
 )
+@pytest.mark.parametrize("initialize_weights", [True, False])
 @pytest.mark.parametrize("residual", [True, False])
 @pytest.mark.parametrize("serde", [identity, save_load, jit_script, jit_save_load])
 def test_convpass(
@@ -50,6 +52,7 @@ def test_convpass(
     padding,
     tmp_path,
     residual,
+    initialize_weights,
     serde,
 ):
     # generate a few versions of the model (serialized/deserialized, jit, etc)
@@ -61,6 +64,7 @@ def test_convpass(
         activation=activation,
         padding=padding,
         residual=residual,
+        initialize_weights=initialize_weights,
     )
     conv_pass_loaded = serde(conv_pass, tmp_path)
 

@@ -1,8 +1,10 @@
+import math
 import warnings
 from typing import Any, Sequence
 
 import torch
 from torch.nn import Conv1d, Conv2d, Conv3d
+from torch.nn.modules.conv import _ConvNd
 
 from .tem import ContextAwareModule
 from .utils import crop
@@ -20,12 +22,9 @@ class ConvPass(ContextAwareModule):
     :param kernel_sizes: a sequence of kernel sizes for each convolutional layer
     :param activation: the activation function to use after each convolutional layer
     :param padding: the padding mode to use for the convolutional layers
+    :param residual: add residual connection from input to output
+    :param initialize_weights: init conv weights based on activation
     """
-
-    _context: torch.Tensor
-    _equivariant_step: torch.Tensor
-    _dims: int
-    residual: bool
 
     def __init__(
         self,
@@ -33,9 +32,10 @@ class ConvPass(ContextAwareModule):
         in_channels: int = 1,
         out_channels: int = 1,
         kernel_sizes: Sequence[Sequence[int] | int] = (3, 3),
-        activation: type[torch.nn.Module] = torch.nn.ReLU,
+        activation: type[torch.nn.Module] | None = torch.nn.ReLU,
         padding: str = "valid",
         residual: bool = False,
+        initialize_weights: bool = True,
     ):
         super().__init__()
 
@@ -56,46 +56,30 @@ class ConvPass(ContextAwareModule):
         }[dims]
 
         for kernel_size in kernel_sizes:
-            # if isinstance(kernel_size, int):
-            #     _kernel_size = (kernel_size,) * dims
-            # else:
-            #     _kernel_size = tuple(kernel_size)
+            if isinstance(kernel_size, int):
+                _kernel_size = (kernel_size,) * dims
+            else:
+                _kernel_size = tuple(kernel_size)
+
             conv_layer = conv(
                 in_channels,
                 out_channels,
-                kernel_size,
+                _kernel_size,
                 padding=padding,
             )
-            # initialize the weights properly
-            assert conv_layer.bias is not None
-            torch.nn.init.zeros_(conv_layer.bias)
-            if activation is torch.nn.ReLU:
-                torch.nn.init.kaiming_uniform_(conv_layer.weight, nonlinearity="relu")
-            elif activation is torch.nn.LeakyReLU:
-                torch.nn.init.kaiming_uniform_(
-                    conv_layer.weight, nonlinearity="leaky_relu"
+
+            if initialize_weights:
+                self._initialize_conv(
+                    conv_layer=conv_layer,
+                    kernel_size=_kernel_size,
+                    in_channels=in_channels,
+                    activation=activation,
                 )
-            elif activation is torch.nn.Sigmoid or activation is torch.nn.Tanh:
-                torch.nn.init.xavier_uniform_(conv_layer.weight)
-            elif activation is torch.nn.Identity:
-                warnings.warn(
-                    "Using Identity activation with the ConvPass module is assumed to be a test case. "
-                    "The convolutional layer will be initialized with constants."
-                )
-                constant = (
-                    1.0
-                    / (
-                        torch.prod(torch.tensor(kernel_size))
-                        if isinstance(kernel_size, Sequence)
-                        else kernel_size**dims
-                    )
-                    / in_channels
-                )
-                torch.nn.init.constant_(conv_layer.weight, constant)
+
             layers.append(conv_layer)
 
             if padding == "valid":
-                self._context += torch.tensor(kernel_size) - 1
+                self._context += torch.tensor(_kernel_size) - 1
 
             in_channels = out_channels
 
@@ -103,6 +87,7 @@ class ConvPass(ContextAwareModule):
                 layers.append(activation())
 
         self.conv_pass = torch.nn.Sequential(*layers)
+
         self.residual_layer = (
             torch.nn.Identity()
             if (not residual or self.in_channels == self.out_channels)
@@ -114,12 +99,44 @@ class ConvPass(ContextAwareModule):
             )
         )
 
+    def _initialize_conv(
+        self,
+        conv_layer: _ConvNd,
+        kernel_size: Sequence[int],
+        in_channels: int,
+        activation: type[torch.nn.Module] | None,
+    ) -> None:
+        assert conv_layer.bias is not None
+        torch.nn.init.zeros_(conv_layer.bias)
+
+        if activation is torch.nn.ReLU:
+            torch.nn.init.kaiming_uniform_(
+                conv_layer.weight,
+                nonlinearity="relu",
+            )
+        elif activation is torch.nn.LeakyReLU:
+            torch.nn.init.kaiming_uniform_(
+                conv_layer.weight,
+                nonlinearity="leaky_relu",
+            )
+        elif activation is torch.nn.Sigmoid or activation is torch.nn.Tanh:
+            torch.nn.init.xavier_uniform_(conv_layer.weight)
+        elif activation is torch.nn.Identity:
+            warnings.warn(
+                "Using Identity activation with the ConvPass module is assumed "
+                "to be a test case. The convolutional layer will be initialized "
+                "with constants."
+            )
+            constant = 1.0 / math.prod(kernel_size) / in_channels
+            torch.nn.init.constant_(conv_layer.weight, constant)
+
     @property
     def context(self) -> torch.Tensor:
         """
         The context of the ConvPass module.
         Set to zero if the padding is "same".
-        Set to the sum of the [kernel_size - 1 for kernel_size in kernel_sizes] if the padding is "valid".
+        Set to the sum of the [kernel_size - 1 for kernel_size in kernel_sizes]
+        if the padding is "valid".
         """
         return self._context
 
@@ -157,8 +174,14 @@ class ConvPass(ContextAwareModule):
 
         :param x: the input tensor
         """
+        y = self.conv_pass(x)
+
         if self.residual:
-            y = self.conv_pass(x)
-            return y + crop(self.residual_layer(x), torch.tensor(y.shape[2:]))
-        else:
-            return self.conv_pass(x)
+            residual = self.residual_layer(x)
+            residual = crop(
+                residual,
+                torch.tensor(y.shape[2:], device=y.device),
+            )
+            return y + residual
+
+        return y

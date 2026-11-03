@@ -1,7 +1,6 @@
 [![tests](https://github.com/pattonw/tems/actions/workflows/tests.yaml/badge.svg)](https://github.com/pattonw/tems/actions/workflows/tests.yaml)
 [![codecov](https://codecov.io/gh/pattonw/tems/branch/main/graph/badge.svg?token=YOUR_TOKEN)](https://codecov.io/gh/pattonw/tems)
-[![ruff](https://github.com/pattonw/tems/actions/workflows/ruff.yaml/badge.svg)](https://github.com/pattonw/tems/actions/workflows/ruff.yaml)
-[![mypy](https://github.com/pattonw/tems/actions/workflows/mypy.yaml/badge.svg)](https://github.com/pattonw/tems/actions/workflows/mypy.yaml)
+[![lint](https://github.com/pattonw/tems/actions/workflows/lint.yaml/badge.svg)](https://github.com/pattonw/tems/actions/workflows/lint.yaml)
 
 [![pypi](https://img.shields.io/pypi/v/tems.svg)](https://pypi.python.org/pypi/tems)
 

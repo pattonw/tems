@@ -30,13 +30,12 @@ version = { attr = "tems.__version__" }
 
 [dependency-groups]
 # Installed by `uv sync` (PEP 735); not part of the published package.
-# ruff is pinned with == until uv.lock is committed: it changes its rule
-# set between releases.
+# ruff and ty versions come from uv.lock; `uv lock --upgrade` moves them.
 dev = [
     "pytest>=8.3.3",
     "pytest-cov>=5.0.0",
-    "ruff==0.17.3",
-    "ty==0.0.96",
+    "ruff>=0.17.3",
+    "ty>=0.0.96",
     "funlib-persistence>=0.5.0",
 ]
 docs = [

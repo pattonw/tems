@@ -15,7 +15,9 @@ keywords = []
 dependencies = ["torch>=2.4"]
 
 [project.urls]
-"github" = "https://github.com/pattonw/tems"
+Documentation = "https://pattonw.github.io/tems"
+Source = "https://github.com/pattonw/tems"
+Issues = "https://github.com/pattonw/tems/issues"
 
 [tool.setuptools]
 include-package-data = true

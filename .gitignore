@@ -6,6 +6,7 @@
 *.egg-info
 *.dat
 *.lock
+!uv.lock
 *.cpp
 *.so
 *.coverage
@@ -13,3 +14,6 @@ build
 .pytest_cache
 .vscode
 .coverage.Williams-MacBook-Pro-2.local.50187.XkuuXdcx
+
+# pytest-cov output
+coverage.xml

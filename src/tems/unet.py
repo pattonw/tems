@@ -1,5 +1,5 @@
 import warnings
-from typing import Sequence
+from collections.abc import Sequence
 
 import torch
 
@@ -131,6 +131,7 @@ class UNet(ContextAwareModule):
                 "This may lead to visible patch artifacts with period equal to the downsampling factor when "
                 "attempting to predict on larger regions. See this paper for more details: "
                 "https://openaccess.thecvf.com/content/ICCV2021/papers/Rumberger_How_Shift_Equivariance_Impacts_Metric_Learning_for_Instance_Segmentation_ICCV_2021_paper.pdf",
+                stacklevel=2,
             )
 
         return self.head_module(x)
@@ -204,6 +205,7 @@ class UNet(ContextAwareModule):
                 kernel_size_down,
                 downsample_factors,
                 kernel_size_up,
+                strict=False,
             )
         ):
             layers.append(

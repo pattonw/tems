@@ -24,10 +24,7 @@ def gcd_coord(self: Coordinate, other: Coordinate):
     """
     Compute the greatest common divisor of two coordinates.
     """
-    return Coordinate(*[gcd(a, b) for a, b in zip(self, other)])
-
-
-Coordinate.gcd = gcd_coord
+    return Coordinate(*[gcd(a, b) for a, b in zip(self, other, strict=False)])
 
 
 @pytest.mark.parametrize("initialize_weights", [True, False])
@@ -56,19 +53,17 @@ def test_translation_equivariance(eval_mode, downsample_factors, initialize_weig
     min_output_shape = Coordinate(unet.min_output_shape)
     context = Coordinate(unet.context) // 2
     downsampling = Coordinate(unet.equivariant_step)
-    blocks = Coordinate(1, 1) + downsampling / downsampling.gcd(
-        min_output_shape
+    blocks = Coordinate(1, 1) + downsampling / gcd_coord(
+        downsampling, min_output_shape
     ) * Coordinate(1, 0)
 
     in_array = Array(
         np.arange(
-            (
-                in_channels
-                * min_output_shape[0]
-                * min_output_shape[1]
-                * blocks[0]
-                * blocks[1]
-            )
+            in_channels
+            * min_output_shape[0]
+            * min_output_shape[1]
+            * blocks[0]
+            * blocks[1]
         ).reshape(1, in_channels, *(min_output_shape * blocks)),
         voxel_size=(1,) * len(min_output_shape),
     )

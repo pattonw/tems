@@ -10,6 +10,6 @@ def crop(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
     """
     x_shape = x.size()[2:]
     offset = (torch.tensor(x_shape, device=y.device) - y) // 2
-    for i, (o, s) in enumerate(zip(offset, y)):
+    for i, (o, s) in enumerate(zip(offset, y, strict=False)):
         x = torch.slice_copy(x, i + 2, o.item(), o.item() + s)
     return x

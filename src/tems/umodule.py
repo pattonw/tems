@@ -159,7 +159,7 @@ class UModule(ContextAwareModule):
 
         x_shape = x.size()[2:]
         offset = (torch.tensor(x_shape) - shape) // 2
-        for i, (o, s) in enumerate(zip(offset, shape)):
+        for i, (o, s) in enumerate(zip(offset, shape, strict=False)):
             x = torch.slice_copy(x, i + 2, o.item(), o.item() + s)
         return x
 

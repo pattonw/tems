@@ -27,9 +27,6 @@ def gcd_coord(self: Coordinate, other: Coordinate):
     return Coordinate(*[gcd(a, b) for a, b in zip(self, other, strict=False)])
 
 
-Coordinate.gcd = gcd_coord
-
-
 @pytest.mark.parametrize("initialize_weights", [True, False])
 @pytest.mark.parametrize("eval_mode", [True, False])
 @pytest.mark.parametrize(
@@ -56,8 +53,8 @@ def test_translation_equivariance(eval_mode, downsample_factors, initialize_weig
     min_output_shape = Coordinate(unet.min_output_shape)
     context = Coordinate(unet.context) // 2
     downsampling = Coordinate(unet.equivariant_step)
-    blocks = Coordinate(1, 1) + downsampling / downsampling.gcd(
-        min_output_shape
+    blocks = Coordinate(1, 1) + downsampling / gcd_coord(
+        downsampling, min_output_shape
     ) * Coordinate(1, 0)
 
     in_array = Array(

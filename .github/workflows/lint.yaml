@@ -13,10 +13,10 @@ jobs:
       # dev group only: torch is not needed to lint
       - run: uv run --only-group dev ruff check .
       - run: uv run --only-group dev ruff format --check .
-  mypy:
+  ty:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
       - run: uv sync
-      - run: uv run mypy src tutorials
+      - run: uv run ty check

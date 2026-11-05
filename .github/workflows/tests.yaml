@@ -26,7 +26,7 @@ jobs:
       - run: uv sync --resolution ${{ matrix.resolution }}
       # no [build-system] yet, so uv sync --locked does not install the package itself
       - run: uv pip install -e .
-      - run: uv run pytest --cov --cov-report=term-missing --cov-report=xml
+      - run: uv run pytest --cov-report=xml
       - uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}

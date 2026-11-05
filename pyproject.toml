@@ -54,7 +54,7 @@ docs = [
 funlib-learn-torch = { git = "https://github.com/funkelab/funlib.learn.torch" }
 
 [tool.ty.src]
-include = ["src", "tests"]
+include = ["src", "tests", "benchmarks"]
 exclude = []  # only ever shrinks
 
 [tool.ty.terminal]
@@ -78,6 +78,9 @@ ignore = ["E501"]  # the formatter owns line length
 "tutorials/**/*.py" = ["E402"]  # jupytext cells import mid-file
 "examples/**/*.py" = ["E402"]
 "__init__.py" = ["F401"]  # re-exports
+
+[tool.pytest.ini_options]
+addopts = "--cov --cov-report=term-missing"
 
 [tool.coverage.run]
 branch = true

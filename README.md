@@ -39,6 +39,7 @@ cd tems
 uv sync                                             # Python, dependencies, dev tools (from uv.lock)
 uv pip install -e .                                 # the package itself (no build backend yet)
 uv run pytest                                       # tests with coverage
+uv run pytest --no-cov tests/<file>.py              # one file, without the coverage floor
 uv run --only-group dev ruff check . && uv run --only-group dev ruff format --check .
 uv run ty check                                     # types
 # docs: see .github/workflows/docs.yaml (notebooks are converted before sphinx-build)

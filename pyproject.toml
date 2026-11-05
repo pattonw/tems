@@ -54,7 +54,7 @@ docs = [
 funlib-learn-torch = { git = "https://github.com/funkelab/funlib.learn.torch" }
 
 [tool.ty.src]
-include = ["src", "tests"]
+include = ["src", "tests", "benchmarks"]
 exclude = []  # only ever shrinks
 
 [tool.ty.terminal]

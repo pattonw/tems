@@ -42,7 +42,12 @@ uv run pytest                                       # tests with coverage
 uv run pytest --no-cov tests/<file>.py              # one file, without the coverage floor
 uv run --only-group dev ruff check . && uv run --only-group dev ruff format --check .
 uv run ty check                                     # types
-# docs: see .github/workflows/docs.yaml (notebooks are converted before sphinx-build)
+# docs, as .github/workflows/docs.yaml builds them (needs pandoc; warnings are errors)
+uv sync --locked --group docs && uv pip install .
+uv run python -m ipykernel install --name tems_env --user
+mkdir -p docs/source/tutorials
+uv run jupytext --to notebook --output docs/source/tutorials/funlib_comparison.ipynb tutorials/funlib_comparison.py
+uv run sphinx-build -W --keep-going docs/source docs/build/html -b html
 ```
 
 `uv.lock` pins the development environment; the `lock-upgrade` workflow refreshes it monthly and opens a pull request.

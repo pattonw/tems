@@ -37,9 +37,6 @@ extensions = [
     "myst_parser",
 ]
 
-nbsphinx_custom_formats = {
-    ".py": ["jupytext.reads", {"fmt", "py:percent"}],
-}
 nbsphinx_kernel_name = "tems_env"
 
 # Add any paths that contain templates here, relative to this directory.

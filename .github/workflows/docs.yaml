@@ -31,9 +31,9 @@ jobs:
       - name: Build documentation
         run: |
           uv run python -m ipykernel install --name tems_env --user
-          uv run jupytext --to notebook ./tutorials/funlib_comparison.py
-          cp -r tutorials docs/source
-          uv run sphinx-build docs/source docs/build/html -b html
+          mkdir -p docs/source/tutorials
+          uv run jupytext --to notebook --output docs/source/tutorials/funlib_comparison.ipynb tutorials/funlib_comparison.py
+          uv run sphinx-build -W --keep-going docs/source docs/build/html -b html
       # The benchmark action keeps its data and dashboard on gh-pages; the
       # site is deployed from this artifact, so bring them along.
       - run: |

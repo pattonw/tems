@@ -36,14 +36,13 @@ The commands below are the ones CI runs, so a green local run means a green PR.
 ```bash
 git clone https://github.com/pattonw/tems
 cd tems
-uv sync                                             # Python, dependencies, dev tools (from uv.lock)
-uv pip install -e .                                 # the package itself (no build backend yet)
+uv sync                                             # Python, dependencies, dev tools (from uv.lock), tems itself
 uv run pytest                                       # tests with coverage
 uv run pytest --no-cov tests/<file>.py              # one file, without the coverage floor
 uv run --only-group dev ruff check . && uv run --only-group dev ruff format --check .
 uv run ty check                                     # types
 # docs, as .github/workflows/docs.yaml builds them (needs pandoc; warnings are errors)
-uv sync --locked --group docs && uv pip install .
+uv sync --locked --group docs
 uv run python -m ipykernel install --name tems_env --user
 mkdir -p docs/source/tutorials
 uv run jupytext --to notebook --output docs/source/tutorials/funlib_comparison.ipynb tutorials/funlib_comparison.py

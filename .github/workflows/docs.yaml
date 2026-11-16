@@ -22,12 +22,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v6
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
       - uses: pandoc/actions/setup@v1
       - run: uv sync --locked --group docs
-      # no [build-system] yet, so uv sync --locked does not install the package itself
-      - run: uv pip install .
       - name: Build documentation
         run: |
           uv run python -m ipykernel install --name tems_env --user
@@ -42,7 +40,7 @@ jobs:
           fi
       # Only a tag or main deploys; a manual run on another branch is a build check.
       - if: github.ref_type == 'tag' || github.ref == 'refs/heads/main'
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: docs/build/html
   deploy:
@@ -54,4 +52,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

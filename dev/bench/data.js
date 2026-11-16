@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1794596418225,
+  "lastUpdate": 1794857477631,
   "repoUrl": "https://github.com/pattonw/tems",
   "entries": {
     "tems": [
@@ -68,6 +68,41 @@ window.BENCHMARK_DATA = {
           {
             "name": "pytest wall time",
             "value": 12.855,
+            "unit": "s",
+            "extra": "`uv run pytest --cov-report=xml` in the tests job"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "William Patton",
+            "username": "pattonw",
+            "email": "wllmpttn24@gmail.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "f4a7fb046d26ccdbded2ab95e8aaf9e62a0a8834",
+          "message": "Merge pull request #12 from pattonw/fix/uv-ty-standard\n\nAdd [build-system]; move actions off the Node 20 runtime",
+          "timestamp": "2026-11-16T19:30:04Z",
+          "url": "https://github.com/pattonw/tems/commit/f4a7fb046d26ccdbded2ab95e8aaf9e62a0a8834"
+        },
+        "date": 1794857477009,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "import tems (cold)",
+            "value": 1702.404,
+            "range": "± 70.346",
+            "unit": "ms",
+            "extra": "interpreter startup 11.6 ms subtracted; n=10"
+          },
+          {
+            "name": "pytest wall time",
+            "value": 13.048,
             "unit": "s",
             "extra": "`uv run pytest --cov-report=xml` in the tests job"
           }
